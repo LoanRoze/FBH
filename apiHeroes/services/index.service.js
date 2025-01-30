@@ -1,0 +1,1 @@
+export * as HeroService from "./hero.service.js"

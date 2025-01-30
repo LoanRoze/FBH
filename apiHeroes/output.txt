@@ -1,0 +1,489 @@
+
+================================================================================
+File: config\database.js
+Size: 214 B
+================================================================================
+
+import { Sequelize } from "sequelize";
+
+const sequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: "./database.sqlite3",
+  // logging: console.log,
+  logging: false,
+});
+
+export default sequelize;
+
+
+================================================================================
+File: controllers\hero.controller.js
+Size: 2 kB
+================================================================================
+
+import { ApiError } from "../errors/api.error.js";
+import { HeroService } from "../services/index.service.js";
+
+export async function getAllHeroes(req, res) {
+  try {
+    const heroes = await HeroService.getAllHeroes();
+    res.json(heroes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function getHeroById(req, res) {
+  try {
+    const id = req.params.id;
+    const hero = await HeroService.getHeroById(id);
+    res.json(hero);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function createHero(req, res) {
+  try {
+    const { alias, identity, powerDate } = req.body;
+    const newHero = await HeroService.createHero({
+      alias,
+      identity,
+      powerDate,
+    });
+    res.json(newHero);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      res.status(error.statusCode).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+}
+
+// Gérez les 400 dans createHero
+// Gérer la mise à jour des héros
+
+export async function updateHero(req, res) {
+  try {
+    const id = req.params.id;
+    const { alias, identity, powerDate } = req.body;
+    const updatedHero = await HeroService.updateHero(id, {
+      alias,
+      identity,
+      powerDate,
+    });
+    res.json(updatedHero);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function deleteHero(req, res) {
+  try {
+    const id = req.params.id;
+    const deletedHero = await HeroService.deleteHero(id);
+    res.json(deletedHero);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function restoreHero(req, res) {
+  try {
+    const id = req.params.id;
+    const restoredHero = await HeroService.restoreHero(id);
+    res.json(restoredHero);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
+================================================================================
+File: controllers\index.controller.js
+Size: 54 B
+================================================================================
+
+export * as HeroController from "./hero.controller.js"
+
+================================================================================
+File: errors\api.error.js
+Size: 465 B
+================================================================================
+
+export class ApiError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
+export class ConflictError extends ApiError {
+  constructor(message) {
+    super(message, 409)
+  }
+}
+
+export class BadRequestError extends ApiError {
+  constructor(message) {
+    super(message, 400)
+  }
+}
+
+export class NotFoundError extends ApiError {
+  constructor(message) {
+    super(message, 404)
+  }
+}
+
+================================================================================
+File: middlewares\log.middleware.js
+Size: 281 B
+================================================================================
+
+export async function logMiddleware (req, res, next) {
+  const date = new Intl.DateTimeFormat("fr-FR").format(new Date());
+  console.log(
+    `${date} - [${req.method}] ${req.url}${
+      req.method === "GET" ? "" : "\n\t" + JSON.stringify(req.body)
+    }`
+  );
+  next();
+}
+
+================================================================================
+File: mocks\hero.mock.js
+Size: 221 B
+================================================================================
+
+export const heroesMocks = [
+  {
+    alias: "Batman",
+    identity: "Bruce Wayne",
+    powerDate: "01/01/1985",
+  },
+  {
+    alias: "Superman",
+    identity: "Clark Kent",
+    powerDate: "01/01/1985",
+  },
+];
+
+
+================================================================================
+File: models\hero.model.js
+Size: 855 B
+================================================================================
+
+import sequelize from "../config/database.js";
+import { DataTypes } from "sequelize";
+
+const Hero = sequelize.define(
+  "heroes",
+  {
+    id: {
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+    },
+    alias: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    identity: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    powerDate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+  },
+  {
+    defaultScope: {
+      where: {
+        isDeleted: false,
+      },
+    },
+    scopes: {
+      deleted: {
+        where: {
+          isDeleted: true,
+        },
+      },
+      withDeleted: {},
+    },
+  }
+);
+
+export default Hero;
+
+
+================================================================================
+File: repositories\hero.repository.js
+Size: 1.68 kB
+================================================================================
+
+import Hero from "../models/hero.model.js";
+
+export async function createHero({ alias, identity, powerDate }) {
+  const hero = await Hero.create({ alias, identity, powerDate });
+  return hero;
+}
+
+export async function getHeroById(id) {
+  const hero = await Hero.findByPk(id);
+  if (!hero) {
+    return null;
+  }
+
+  return hero;
+}
+
+export async function getDeletedHeroById(id) {
+  const hero = await Hero.scope("deleted").findByPk(id);
+  if (!hero) {
+    return null;
+  }
+
+  return hero;
+}
+
+export async function updateHero(id, values) {
+  const hero = await getHeroById(id);
+  if (!hero) {
+    return null;
+  }
+
+  return await hero.update(values);
+}
+
+export async function deleteHero(id) {
+  const hero = await getHeroById(id);
+  if (!hero) {
+    return null;
+  }
+
+  return await updateHero(hero.id, { isDeleted: true });
+}
+
+export async function getAllHeroes() {
+  return await Hero.findAll();
+}
+
+export async function heroExists(alias) {
+  const hero = await Hero.findOne({ where: { alias } });
+  return Boolean(hero);
+}
+
+export async function heroDeletedExists(alias) {
+  const hero = await Hero.scope("deleted").findOne({ where: { alias } });
+  return Boolean(hero);
+}
+
+export async function getAllHeroesWithDeleted() {
+  await Hero.scope("withDeleted").findAll();
+}
+
+export async function getAllHeroesDeleted() {
+  await Hero.scope("deleted").findAll();
+}
+
+export async function restoreHero(id) {
+  const deletedHero = await getDeletedHeroById(id);  
+
+  if (!deletedHero || (await heroExists(deletedHero.alias))) {
+    return null;
+  }
+
+  return await deletedHero.update({ isDeleted: false });
+}
+
+
+================================================================================
+File: repositories\index.repository.js
+Size: 57 B
+================================================================================
+
+export * as HeroRepository from "./hero.repository.js";
+
+
+================================================================================
+File: routers\hero.router.js
+Size: 464 B
+================================================================================
+
+import express from "express";
+import { HeroController } from "../controllers/index.controller.js";
+
+const router = express.Router()
+
+router.get("/", HeroController.getAllHeroes);
+router.get("/:id", HeroController.getHeroById);
+router.post("/", HeroController.createHero);
+router.put("/:id", HeroController.updateHero);
+router.delete("/:id", HeroController.deleteHero);
+
+router.patch("/:id/restore", HeroController.restoreHero)
+
+export default router;
+
+================================================================================
+File: server.js
+Size: 583 B
+================================================================================
+
+import sequelize from "./config/database.js";
+import express from "express";
+import router from "./routers/hero.router.js";
+import { logMiddleware } from "./middlewares/log.middleware.js";
+
+import { initializeHeroMock } from "./services/mock.service.js";
+
+await sequelize.sync({ force: true });
+console.log("Base de donnée synchronisée !");
+
+await initializeHeroMock();
+
+const app = express();
+
+app.use(express.json());
+app.use(logMiddleware);
+
+app.use("/api/v1/heroes/", router);
+
+app.listen(3000, () => console.log("Server listen on http://localhost:3000"));
+
+
+================================================================================
+File: services\hero.service.js
+Size: 2.29 kB
+================================================================================
+
+import {
+  ConflictError,
+  BadRequestError,
+  NotFoundError,
+} from "../errors/api.error.js";
+import { HeroRepository } from "../repositories/index.repository.js";
+
+export async function getHeroById(id) {
+  const hero = await HeroRepository.getHeroById(id);
+
+  if (!hero) {
+    throw new Error("Le héros n'existe pas.");
+  }
+
+  return {
+    id: hero.id,
+    alias: hero.alias,
+    powerDate: hero.powerDate.slice(-4),
+  };
+}
+
+export async function createHero({ alias, identity, powerDate }) {
+  if (!alias || alias.length < 3 || !/^[a-zA-Z ]+$/.test(alias)) {
+    throw new BadRequestError("Alias non valide (3 caractères min, etc.)");
+  }
+
+  if (await HeroRepository.heroExists(alias)) {
+    throw new ConflictError("Le héros existe déjà (alias).");
+  }
+
+  const hero = await HeroRepository.createHero({ alias, identity, powerDate });
+
+  return hero.dataValues;
+}
+
+export async function updateHero(id, { alias, identity, powerDate }) {
+  if (!alias || alias.length < 3 || !/^[a-zA-Z ]+$/.test(alias)) {
+    throw new BadRequestError("Alias non valide (3 caractères min, etc.)");
+  }
+
+  if (await HeroRepository.heroExists(alias)) {
+    throw new ConflictError("Le héros existe déjà (alias).");
+  }
+
+  if (!await HeroRepository.getHeroById(id)) {
+    throw new NotFoundError("Le héros n'existe pas, id:");
+  }
+
+  const hero = await HeroRepository.updateHero(id, {
+    alias,
+    identity,
+    powerDate,
+  });
+
+  return hero.dataValues;
+}
+
+export async function deleteHero(id) {
+  if (!(await getHeroById(id))) {
+    throw new Error("Le héros n'existe pas.");
+  }
+
+  return await HeroRepository.deleteHero(id);
+}
+
+export async function getAllHeroes() {
+  const heroes = await HeroRepository.getAllHeroes();
+
+  const formattedHeroes = heroes.map((hero) => {
+    return {
+      id: hero.id,
+      alias: hero.alias,
+      powerDate: hero.powerDate.slice(-4),
+    };
+  });
+
+  return formattedHeroes;
+}
+
+export async function restoreHero(id) {
+  const restoredHero = await HeroRepository.restoreHero(id);
+
+  if (!restoredHero) {
+    throw new Error(
+      "Le héros n'existe pas ou un héros avec un alias identique existe, il ne peut pas être restoré."
+    );
+  }
+
+  return restoredHero;
+}
+
+
+================================================================================
+File: services\index.service.js
+Size: 48 B
+================================================================================
+
+export * as HeroService from "./hero.service.js"
+
+================================================================================
+File: services\mock.service.js
+Size: 538 B
+================================================================================
+
+import { heroesMocks } from "../mocks/hero.mock.js";
+import { HeroService } from "./index.service.js";
+
+export async function initializeHeroMock() {
+  console.log("========== START HERO MOCKING ==========");
+  for (const hero of heroesMocks) {
+    try {
+      const newHero = await HeroService.createHero(hero);
+      console.log(newHero);
+    } catch (error) {
+      console.log("[ERROR]", error.message);
+    }
+  }
+  console.log("========== ENDING HERO MOCKING ==========");
+  return await HeroService.getAllHeroes();
+}
+
