@@ -1,42 +1,54 @@
 import sequelize from "../config/database.js";
 import { DataTypes } from "sequelize";
+import Power from "./power.model.js";
 
 const Hero = sequelize.define(
   "heroes",
   {
-    id: {
+    hero_id: {
       primaryKey: true,
       type: DataTypes.INTEGER,
       autoIncrement: true,
     },
-    alias: {
+    hero_alias: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    identity: {
+    hero_identity: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    powerDate: {
+    hero_powerDate: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    isDeleted: {
+    hero_isDeleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     },
+    hero_rank: {
+      type: DataTypes.JSON,
+      allowNull: false
+    },
+    hero_power_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: Power,
+        key: power_id,
+      }
+    }
   },
   {
     defaultScope: {
       where: {
-        isDeleted: false,
+        hero_isDeleted: false,
       },
     },
     scopes: {
       deleted: {
         where: {
-          isDeleted: true,
+          hero_isDeleted: true,
         },
       },
       withDeleted: {},
