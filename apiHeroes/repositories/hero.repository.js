@@ -1,14 +1,14 @@
 import Hero from "../models/hero.model.js";
 
 // CREATE
-export async function createHero({ alias, identity, powerDate }) {
-  const hero = await Hero.create({ alias, identity, powerDate });
+export async function createHero({ hero_alias, hero_identity, hero_powerDate }) {
+  const hero = await Hero.create({ hero_alias, hero_identity, hero_powerDate });
   return hero;
 }
 
 // READ
-export async function getHeroById(id) {
-  const hero = await Hero.findByPk(id);
+export async function getHeroById(hero_id) {
+  const hero = await Hero.findByPk(hero_id);
   if (!hero) {
     return null;
   }
@@ -16,8 +16,8 @@ export async function getHeroById(id) {
   return hero;
 }
 
-export async function getDeletedHeroById(id) {
-  const hero = await Hero.scope("deleted").findByPk(id);
+export async function getDeletedHeroById(hero_id) {
+  const hero = await Hero.scope("deleted").findByPk(hero_id);
   if (!hero) {
     return null;
   }
@@ -29,13 +29,13 @@ export async function getAllHeroes() {
   return await Hero.findAll();
 }
 
-export async function heroExists(alias) {
-  const hero = await Hero.findOne({ where: { alias } });
+export async function heroExists(hero_alias) {
+  const hero = await Hero.findOne({ where: { hero_alias } });
   return Boolean(hero);
 }
 
-export async function heroDeletedExists(alias) {
-  const hero = await Hero.scope("deleted").findOne({ where: { alias } });
+export async function heroDeletedExists(hero_alias) {
+  const hero = await Hero.scope("deleted").findOne({ where: { hero_alias } });
   return Boolean(hero);
 }
 
@@ -49,8 +49,8 @@ export async function getAllHeroesDeleted() {
 
 
 // UPDATE 
-export async function updateHero(id, values) {
-  const hero = await getHeroById(id);
+export async function updateHero(hero_id, values) {
+  const hero = await getHeroById(hero_id);
   if (!hero) {
     return null;
   }
@@ -58,24 +58,24 @@ export async function updateHero(id, values) {
   return await hero.update(values);
 }
 
-export async function restoreHero(id) {
-  const deletedHero = await getDeletedHeroById(id);
+export async function restoreHero(hero_id) {
+  const deletedHero = await getDeletedHeroById(hero_id);
 
   if (!deletedHero) {
     return null;
   }
 
-  return await deletedHero.update({ isDeleted: false });
+  return await deletedHero.update({ hero_isDeleted: false });
 }
 
 // DELETE
-export async function deleteHero(id) {
-  const hero = await getHeroById(id);
+export async function deleteHero(hero_id) {
+  const hero = await getHeroById(hero_id);
   if (!hero) {
     return null;
   }
 
-  return await updateHero(hero.id, { isDeleted: true });
+  return await updateHero(hero.hero_id, { hero_isDeleted: true });
 }
 
 
