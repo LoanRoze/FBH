@@ -21,7 +21,7 @@ export async function assignHeroToMission(hero_id, mission_id) {
 }
 
 export async function assignHeroesToMission(heroes_id, mission_id) {
-  const mission_heroes = heroes_id.map(hero_id => { assignHeroToMission(hero_id, mission_id) })
+  const mission_heroes = heroes_id.map((hero_id) => { return assignHeroToMission(hero_id, mission_id) })
   return mission_heroes
 }
 

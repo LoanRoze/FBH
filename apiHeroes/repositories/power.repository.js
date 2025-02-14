@@ -30,7 +30,13 @@ export async function getAllPowers() {
 }
 
 export async function getPowerByLabel(power_label) {
-  return await Power.findOne({ where: { power_label } });
+  const power = await Power.findOne({ where: { power_label } });
+
+  if (!power) {
+    return null;
+  }
+  
+  return power
 }
 
 export async function getAllPowersDeleted() {
