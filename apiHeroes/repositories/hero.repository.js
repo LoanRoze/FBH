@@ -1,10 +1,12 @@
 import Hero from "../models/hero.model.js";
 
+// CREATE
 export async function createHero({ alias, identity, powerDate }) {
   const hero = await Hero.create({ alias, identity, powerDate });
   return hero;
 }
 
+// READ
 export async function getHeroById(id) {
   const hero = await Hero.findByPk(id);
   if (!hero) {
@@ -21,24 +23,6 @@ export async function getDeletedHeroById(id) {
   }
 
   return hero;
-}
-
-export async function updateHero(id, values) {
-  const hero = await getHeroById(id);
-  if (!hero) {
-    return null;
-  }
-
-  return await hero.update(values);
-}
-
-export async function deleteHero(id) {
-  const hero = await getHeroById(id);
-  if (!hero) {
-    return null;
-  }
-
-  return await updateHero(hero.id, { isDeleted: true });
 }
 
 export async function getAllHeroes() {
@@ -63,6 +47,17 @@ export async function getAllHeroesDeleted() {
   await Hero.scope("deleted").findAll();
 }
 
+
+// UPDATE 
+export async function updateHero(id, values) {
+  const hero = await getHeroById(id);
+  if (!hero) {
+    return null;
+  }
+
+  return await hero.update(values);
+}
+
 export async function restoreHero(id) {
   const deletedHero = await getDeletedHeroById(id);  
 
@@ -72,3 +67,17 @@ export async function restoreHero(id) {
 
   return await deletedHero.update({ isDeleted: false });
 }
+
+// DELETE
+export async function deleteHero(id) {
+  const hero = await getHeroById(id);
+  if (!hero) {
+    return null;
+  }
+
+  return await updateHero(hero.id, { isDeleted: true });
+}
+
+
+
+
