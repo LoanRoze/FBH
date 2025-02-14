@@ -59,7 +59,7 @@ export async function updateHero(id, values) {
 }
 
 export async function restoreHero(id) {
-  const deletedHero = await getDeletedHeroById(id);  
+  const deletedHero = await getDeletedHeroById(id);
 
   if (!deletedHero) {
     return null;
