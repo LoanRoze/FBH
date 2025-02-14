@@ -1,8 +1,8 @@
 import Hero from "../models/hero.model.js";
 
 // CREATE
-export async function createHero({ hero_alias, hero_identity, hero_powerDate }) {
-  const hero = await Hero.create({ hero_alias, hero_identity, hero_powerDate });
+export async function createHero({ hero_alias, hero_identity, hero_powerDate, hero_rank, power_id }) {
+  const hero = await Hero.create({ hero_alias, hero_identity, hero_powerDate, hero_rank, power_id });
   return hero;
 }
 
@@ -67,6 +67,27 @@ export async function restoreHero(hero_id) {
 
   return await deletedHero.update({ hero_isDeleted: false });
 }
+
+export async function setHeroPower(hero_id, power_id) {
+  const hero = await getHeroById(hero_id);
+
+  if (!hero) {
+    return null;
+  }
+
+  return hero.setDataValue('power_id', power_id)
+}
+
+export async function removePowerFromHero(hero_id) {
+  const hero = await getHeroById(hero_id);
+
+  if (!hero) {
+    return null;
+  }
+
+  return hero.setDataValue('power_id', null)
+}
+
 
 // DELETE
 export async function deleteHero(hero_id) {
