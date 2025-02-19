@@ -90,3 +90,46 @@ export async function getAllPowersDeleted() {
 
 
 // UPDATE
+
+export async function updatePower(power_id, {power_label}) {
+    if (power_label.length < 3 || !/^[a-zA-Z ]+$/.test(power_label)) {
+        throw new BadRequestError("Libellé du pouvoir non valide (Minimum 3 caractères, pas de caractères spéciaux")
+    }
+    if (power_label === null) {
+        return null
+    }
+
+    if (await PowerRepository.powerExists(power_label)) {
+        return PowerRepository.getPowerByLabel(power_label).dataValues
+    } else {
+        const power = await PowerRepository.updatePower(power_id, { power_label })
+        
+        return power.dataValues
+    }
+}
+
+export async function restorePower(power_id) {
+    const restoredPower = await PowerRepository.restorePower(power_id);
+
+    if(!restoredPower) {
+        throw new NotFoundError(
+          "Le pouvoir n'existe pas. Le pouvoir ne peut pas être restauré."
+        );
+      }
+    
+      if (await PowerRepository.powerExists(restoredHero.power_label)) {
+        throw new ConflictError("Le label du pouvoir existe déjà. Le pouvoir ne peut pas être restauré.")
+      }
+    
+      return restoredPower;
+}
+
+// DELETE
+
+export async function deletePower(power_id) {
+  if (!(await getPowerById(power_id))) {
+    throw new NotFoundError("Le pouvoir n'existe pas.");
+  }
+
+  return await PowerRepository.deletePower(power_id);
+}

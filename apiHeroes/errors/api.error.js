@@ -22,3 +22,4 @@ export class NotFoundError extends ApiError {
     super(message, 404)
   }
 }
+
