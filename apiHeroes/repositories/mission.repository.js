@@ -82,8 +82,8 @@ export async function removeHeroFromMission(hero_id, mission_id) {
 
 
 // DELETE
-export async function deleteMission(id) {
-  const mission = await getMissionById(id);
+export async function deleteMission(mission_id) {
+  const mission = await getMissionById(mission_id);
   if (!mission) {
     return null;
   }
