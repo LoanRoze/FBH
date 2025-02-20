@@ -11,7 +11,7 @@ import { PowerService } from "./index.service.js";
 // CREATE
 export async function createHero({ hero_alias, hero_identity, hero_powerDate, hero_rank, power_label }) {
   if (!hero_alias || hero_alias.length < 3 || !/^[a-zA-Z ]+$/.test(hero_alias)) {
-    throw new BadRequestError("Alias non valide (3 caractères min, etc.)");
+    throw new BadRequestError("Alias non valide (3 caractères min et caractères spéciaux interdits).");
   }
 
   if (await HeroRepository.heroExists(hero_alias)) {
@@ -120,7 +120,7 @@ export async function getAllHeroesDeleted() {
 
 export async function updateHero(hero_id, { hero_alias, hero_identity, hero_powerDate, hero_rank, power_label }) {
   if (!hero_alias || hero_alias.length < 3 || !/^[a-zA-Z ]+$/.test(hero_alias)) {
-    throw new BadRequestError("Alias non valide (3 caractères min, etc.)");
+    throw new BadRequestError("Alias non valide (3 caractères min et caractères spéciaux interdits).");
   }
 
   if (await HeroRepository.heroExists(hero_alias)) {

@@ -9,7 +9,7 @@ import { PowerRepository } from "../repositories/index.repository.js";
 // CREATE
 export async function createPower(power_label) {
     if (power_label.length < 3 || !/^[a-zA-Z ]+$/.test(power_label)) {
-        throw new BadRequestError("Libellé du pouvoir non valide (Minimum 3 caractères, pas de caractères spéciaux")
+        throw new BadRequestError("Libellé du pouvoir non valide (3 caractères min et caractères spéciaux interdits).")
     }
     if (power_label === null) {
         return null
@@ -93,7 +93,7 @@ export async function getAllPowersDeleted() {
 
 export async function updatePower(power_id, {power_label}) {
     if (power_label.length < 3 || !/^[a-zA-Z ]+$/.test(power_label)) {
-        throw new BadRequestError("Libellé du pouvoir non valide (Minimum 3 caractères, pas de caractères spéciaux")
+        throw new BadRequestError("Libellé du pouvoir non valide (3 caractères min et caractères spéciaux interdits).")
     }
     if (power_label === null) {
         return null
