@@ -1,5 +1,5 @@
 import express from 'express';
-import { PowerController } from '../controllers/power.controller.js';
+import { PowerController } from '../controllers/index.controller.js';
 
 const router = express.Router()
 
