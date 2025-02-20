@@ -1,8 +1,4 @@
-import {
-    ConflictError,
-    BadRequestError,
-    NotFoundError,
-} from "../errors/api.error.js";
+import { ConflictError, BadRequestError, NotFoundError } from "../errors/api.error.js";
 import { HeroRepository, MissionRepository } from "../repositories/index.repository.js";
 import RANKS from "../enums/rank.enum.js";
 import { getHeroById } from "./hero.service.js";
