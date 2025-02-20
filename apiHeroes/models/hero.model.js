@@ -35,7 +35,7 @@ const Hero = sequelize.define(
       type: DataTypes.INTEGER,
       references: {
         model: Power,
-        key: power_id,
+        key: 'power_id',
       }
     }
   },

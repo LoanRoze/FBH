@@ -3,11 +3,11 @@ import { HeroService } from "../services/index.service.js";
 // CREATE
 export async function createHero(req, res, next) {
   try {
-    const { hero_alias, hero_identity, hero_power_date, hero_rank, power_label } = req.body;
+    const { hero_alias, hero_identity, hero_powerDate, hero_rank, power_label } = req.body;
     const newHero = await HeroService.createHero({
       hero_alias,
       hero_identity,
-      hero_power_date,
+      hero_powerDate,
       hero_rank,
       power_label
     });
@@ -69,11 +69,11 @@ export async function getAllHeroesDeleted(req, res, next) {
 export async function updateHero(req, res, next) {
   try {
     const id = req.params.id;
-    const { hero_alias, hero_identity, hero_power_date, hero_rank, power_label } = req.body;
+    const { hero_alias, hero_identity, hero_powerDate, hero_rank, power_label } = req.body;
     const hero = await HeroService.updateHero(id, {
       hero_alias,
       hero_identity,
-      hero_power_date,
+      hero_powerDate,
       hero_rank,
       power_label
     });

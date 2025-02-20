@@ -1,14 +1,15 @@
 import express from "express";
 import { HeroController } from "../controllers/index.controller.js";
 
-const router = express.Router()
+const heroes_router = express.Router()
 
-router.get("/", HeroController.getAllHeroes);
-router.get("/:id", HeroController.getHeroById);
-router.post("/", HeroController.createHero);
-router.put("/:id", HeroController.updateHero);
-router.delete("/:id", HeroController.deleteHero);
+heroes_router.get("/heroes/", HeroController.getAllHeroes);
+heroes_router.get("/heroes/:id", HeroController.getHeroById);
+heroes_router.get("/heroes/", HeroController.getAllHeroes);
+heroes_router.post("/heroes/", HeroController.createHero);
+heroes_router.put("/heroes/:id", HeroController.updateHero);
+heroes_router.delete("/heroes/:id", HeroController.deleteHero);
 
-router.patch("/:id/restore", HeroController.restoreHero)
+heroes_router.patch("/heroes/:id/restore", HeroController.restoreHero)
 
-export default router;
+export default heroes_router;
