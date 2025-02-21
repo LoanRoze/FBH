@@ -18,7 +18,7 @@ const Mission = sequelize.define(
       allowNull: false,
     },
     mission_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     mission_isCompleted: {

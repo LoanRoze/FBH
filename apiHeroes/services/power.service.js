@@ -7,7 +7,7 @@ import {
 import { PowerRepository } from "../repositories/index.repository.js";
 
 // CREATE
-export async function createPower(power_label) {
+export async function createPower({power_label}) {    
     if (power_label.length < 3 || !/^[a-zA-Z ]+$/.test(power_label)) {
         throw new BadRequestError("Libellé du pouvoir non valide (3 caractères min et caractères spéciaux interdits).")
     }
@@ -15,8 +15,8 @@ export async function createPower(power_label) {
         return null
     }
 
-    if (await PowerRepository.powerExists(power_label)) {
-        return PowerRepository.getPowerByLabel(power_label).dataValues
+    if (await PowerRepository.powerExists(power_label)) {        
+        return await getPowerByLabel(power_label)
     } else {
         const power = await PowerRepository.createPower({ power_label })
         
@@ -34,7 +34,7 @@ export async function getPowerById(power_id) {
 
     return {
         power_id: power.power_id,
-        power_alias: power.power_alias,
+        power_label: power.power_label,
     }
 }
 
@@ -47,7 +47,7 @@ export async function getPowerByLabel(power_label) {
 
     return {
         power_id: power.power_id,
-        power_alias: power.power_alias,
+        power_label: power.power_label,
     }
 }
 
@@ -60,7 +60,7 @@ export async function getDeletedPowerById(power_id) {
 
     return {
         power_id: power.power_id,
-        power_alias: power.power_alias,
+        power_label: power.power_label,
     }
 }
 
@@ -70,7 +70,7 @@ export async function getAllPowers() {
     const formattedPowers = powers.map((power) => {
         return {
             power_id : power.power_id,
-            power_alias : power.power_alias,
+            power_label : power.power_label,
         }
     })
     return formattedPowers
@@ -82,7 +82,7 @@ export async function getAllPowersDeleted() {
     const formattedPowers = powers.map((power) => {
         return {
             power_id : power.power_id,
-            power_alias : power.power_alias,
+            power_label : power.power_label,
         }
     })
     return formattedPowers

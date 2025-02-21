@@ -3,32 +3,48 @@ import Mission_Hero from "../models/mission_hero.model.js";
 import { getHeroById } from "./hero.repository.js";
 
 // CREATE
-export async function createMission({ mission_type, mission_location, mission_date, mission_rank }) {
-  const mission = await Mission.create({ mission_type, mission_location, mission_date, mission_rank });
+export async function createMission({
+  mission_type,
+  mission_location,
+  mission_date,
+  mission_rank,
+}) {
+  console.log(mission_date);
+
+  const mission = await Mission.create({
+    mission_type,
+    mission_location,
+    mission_date,
+    mission_rank,
+  });
   return mission;
 }
 
 export async function assignHeroToMission(hero_id, mission_id) {
   const mission = await getMissionById(mission_id);
   const hero = await getMissionById(hero_id);
+
   if (!mission || !hero) {
     return null;
   }
 
-  const mission_hero = await Mission_Hero.create({ hero_id, mission_id })
+  const mission_hero = await Mission_Hero.create({ hero_id, mission_id });
 
-  return mission_hero
+  return mission_hero;
 }
 
 export async function assignHeroesToMission(heroes_id, mission_id) {
-  const mission_heroes = heroes_id.map((hero_id) => { return assignHeroToMission(hero_id, mission_id) })
-  return mission_heroes
-}
+  const mission_heroes = heroes_id.map((hero_id) => {
+    return assignHeroToMission(hero_id, mission_id);
+  });
 
+  return mission_heroes;
+}
 
 // READ
 export async function getMissionById(mission_id) {
   const mission = await Mission.findByPk(mission_id);
+
   if (!mission) {
     return null;
   }
@@ -50,19 +66,23 @@ export async function missionExists(mission_type) {
 }
 
 export async function getMissionHeroId(hero_id, mission_id) {
-  const hero = await getHeroById(hero_id)
-  const mission = await getMissionById(mission_id)
+  const hero = await getHeroById(hero_id);
+  const mission = await getMissionById(mission_id);
 
   if (!hero || !mission) {
-    return null
+    return null;
   }
-  const mission_hero_id = await Mission_Hero.findOne({ where: { hero_id, mission_id } })
-  return mission_hero_id
+  const mission_hero_id = await Mission_Hero.findOne({
+    where: { hero_id, mission_id },
+  });
+
+  return mission_hero_id;
 }
 
-// UPDATE 
+// UPDATE
 export async function updateMission(mission_id, mission_values) {
   const mission = await getMissionById(mission_id);
+
   if (!mission) {
     return null;
   }
@@ -71,23 +91,22 @@ export async function updateMission(mission_id, mission_values) {
 }
 
 export async function removeHeroFromMission(hero_id, mission_id) {
-  const hero_mission = await getMissionHeroId(hero_id, mission_id)
-  
-  if (!hero_mission) {
-    return null
-  }
-  
-  return await hero_mission.destroy()
-}
+  const hero_mission = await getMissionHeroId(hero_id, mission_id);
 
+  if (!hero_mission) {
+    return null;
+  }
+
+  return await hero_mission.destroy();
+}
 
 // DELETE
 export async function deleteMission(mission_id) {
   const mission = await getMissionById(mission_id);
+  
   if (!mission) {
     return null;
   }
 
   return await mission.destroy();
 }
-

@@ -18,7 +18,10 @@ export async function createMission(req, res, next) {
 
 export async function assignHeroToMission(req, res, next) {
     try {
+        
         const { hero_id, mission_id } = req.body;
+        console.log(hero_id, mission_id);
+        
         const mission_hero = await MissionService.assignHeroToMission(hero_id, mission_id);
         res.json(mission_hero);
     } catch (error) {
