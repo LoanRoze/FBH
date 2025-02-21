@@ -2,7 +2,6 @@ import { ConflictError, BadRequestError, NotFoundError } from "../errors/api.err
 import { HeroRepository, MissionRepository } from "../repositories/index.repository.js";
 import RANKS from "../enums/rank.enum.js";
 import { getHeroById } from "./hero.service.js";
-import { getMissionById } from "../repositories/mission.repository.js";
 
 // CREATE
 export async function createMission({ mission_type, mission_location, mission_date, mission_rank }) {

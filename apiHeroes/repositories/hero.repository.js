@@ -1,8 +1,9 @@
 import Hero from "../models/hero.model.js";
 
 // CREATE
-export async function createHero({ hero_alias, hero_identity, hero_powerDate, hero_rank, power_id }) {
-  const hero = await Hero.create({ hero_alias, hero_identity, hero_powerDate, hero_rank, power_id });
+export async function createHero({ hero_alias, hero_identity, hero_powerDate, hero_rank, hero_power_id }) {
+  console.log(hero_rank)
+  const hero = await Hero.create({ hero_alias, hero_identity, hero_powerDate, hero_rank, hero_power_id });
   return hero;
 }
 

@@ -15,14 +15,14 @@ const Mission_Hero = sequelize.define(
       type: DataTypes.INTEGER,
       references: {
         model: Hero,
-        key: hero_id,
+        key: "hero_id",
       }
     },
     mission_id: {
       type: DataTypes.INTEGER,
       references: {
         model: Mission,
-        key: mission_id,
+        key: "mission_id",
       }
     },
   },

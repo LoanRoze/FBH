@@ -1,4 +1,4 @@
-import { MissionService } from "../services/mission.service.js";
+import { MissionService } from "../services/index.service.js";
 
 // CREATE
 export async function createMission(req, res, next) {
