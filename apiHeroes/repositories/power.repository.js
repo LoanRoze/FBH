@@ -9,6 +9,7 @@ export async function createPower({ power_label }) {
 // READ
 export async function getPowerById(power_id) {
   const power = await Power.findByPk(power_id);
+
   if (!power) {
     return null;
   }
@@ -18,6 +19,7 @@ export async function getPowerById(power_id) {
 
 export async function getDeletedPowerById(power_id) {
   const power = await Power.scope("deleted").findByPk(power_id);
+
   if (!power) {
     return null;
   }
@@ -35,8 +37,8 @@ export async function getPowerByLabel(power_label) {
   if (!power) {
     return null;
   }
-  
-  return power
+
+  return power;
 }
 
 export async function getAllPowersDeleted() {
@@ -51,6 +53,7 @@ export async function powerExists(power_label) {
 // UPDATE
 export async function updatePower(power_id, values) {
   const power = await getPowerById(power_id);
+
   if (!power) {
     return null;
   }
@@ -60,6 +63,7 @@ export async function updatePower(power_id, values) {
 
 export async function restorePower(power_id) {
   const power = await Power.scope("deleted").findByPk(power_id);
+
   if (!power) {
     return null;
   }
@@ -70,10 +74,10 @@ export async function restorePower(power_id) {
 // DELETE
 export async function deletePower(power_id) {
   const power = await getPowerById(power_id);
+
   if (!power) {
     return null;
   }
 
   return await updatePower(power.id, { isDeleted: true });
 }
-

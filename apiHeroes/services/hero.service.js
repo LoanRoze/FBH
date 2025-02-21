@@ -3,48 +3,67 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../errors/api.error.js";
-import { HeroRepository, PowerRepository } from "../repositories/index.repository.js";
+import {
+  HeroRepository,
+  PowerRepository,
+} from "../repositories/index.repository.js";
 import RANKS from "../enums/rank.enum.js";
 import { PowerService } from "./index.service.js";
 
-
 // CREATE
-export async function createHero({ hero_alias, hero_identity, hero_powerDate, hero_rank, power_label }) {
-  if (!hero_alias || hero_alias.length < 3 || !/^[a-zA-Z ]+$/.test(hero_alias)) {
-    throw new BadRequestError("Alias non valide (3 caractères min et caractères spéciaux interdits).");
+export async function createHero({
+  hero_alias,
+  hero_identity,
+  hero_powerDate,
+  hero_rank,
+  power_label,
+}) {
+  if (
+    !hero_alias ||
+    hero_alias.length < 3 ||
+    !/^[a-zA-Z ]+$/.test(hero_alias)
+  ) {
+    throw new BadRequestError(
+      "Alias non valide (3 caractères min et caractères spéciaux interdits)."
+    );
   }
 
   if (await HeroRepository.heroExists(hero_alias)) {
     throw new ConflictError("Le héros existe déjà (alias).");
   }
-  if (!(Object.keys(RANKS).includes(hero_rank))) {
-    throw new BadRequestError("Rank non valide (S+, S, A, B, C)")
+  if (!Object.keys(RANKS).includes(hero_rank)) {
+    throw new BadRequestError("Rank non valide (S+, S, A, B, C)");
   }
+  const rank_object = Object.entries(RANKS).find(([key]) => key === hero_rank);
+
   const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-  if (!dateRegex.test(hero_powerDate) || !(new Date(hero_powerDate).toISOString().slice(0, 10) === hero_powerDate)) {
-    throw new BadRequestError("Date d'obtention du pouvoir non valide (format YYYY-MM-DD attendu)")
+  if (
+    !dateRegex.test(hero_powerDate) ||
+    !(new Date(hero_powerDate).toISOString().slice(0, 10) === hero_powerDate)
+  ) {
+    throw new BadRequestError(
+      "Date d'obtention du pouvoir non valide (format YYYY-MM-DD attendu)"
+    );
   }
 
-  const rank_object = Object.entries(RANKS).find(([key]) => key === hero_rank)
-  let power = null
+  let power = null;
   if (power_label != "") {
     if (await PowerRepository.powerExists(power_label)) {
-      const existingPower = await PowerService.getPowerByLabel(power_label)
-      power = existingPower.power_id
+      const existingPower = await PowerService.getPowerByLabel(power_label);
+      power = existingPower.power_id;
     } else {
-      const newPower = await PowerService.createPower(power_label)
-      power = newPower.power_id
+      const newPower = await PowerService.createPower(power_label);
+      power = newPower.power_id;
     }
   }
 
-  const hero = await HeroRepository.createHero(
-    {
-      hero_alias,
-      hero_identity,
-      hero_powerDate,
-      hero_rank: rank_object,
-      hero_power_id: power
-    });
+  const hero = await HeroRepository.createHero({
+    hero_alias,
+    hero_identity,
+    hero_powerDate,
+    hero_rank: rank_object,
+    hero_power_id: power,
+  });
 
   return hero.dataValues;
 }
@@ -61,7 +80,7 @@ export async function getHeroById(hero_id) {
     hero_id: hero.hero_id,
     hero_alias: hero.hero_alias,
     hero_powerDate: hero.hero_powerDate.slice(-5),
-    hero_rank: hero.hero_rank[0]
+    hero_rank: hero.hero_rank[0],
   };
 }
 
@@ -76,7 +95,7 @@ export async function getDeletedHeroById(hero_id) {
     hero_id: hero.hero_id,
     hero_alias: hero.hero_alias,
     hero_powerDate: hero.hero_powerDate.slice(-5),
-    hero_rank: hero.hero_rank[0]
+    hero_rank: hero.hero_rank[0],
   };
 }
 
@@ -127,38 +146,52 @@ export async function getAllHeroesDeleted() {
 
 // UPDATE
 
-export async function updateHero(hero_id, { hero_alias, hero_identity, hero_powerDate, hero_rank, power_label }) {
-  if (!hero_alias || hero_alias.length < 3 || !/^[a-zA-Z ]+$/.test(hero_alias)) {
-    throw new BadRequestError("Alias non valide (3 caractères min et caractères spéciaux interdits).");
+export async function updateHero(
+  hero_id,
+  { hero_alias, hero_identity, hero_powerDate, hero_rank, power_label }
+) {
+  if (
+    !hero_alias ||
+    hero_alias.length < 3 ||
+    !/^[a-zA-Z ]+$/.test(hero_alias)
+  ) {
+    throw new BadRequestError(
+      "Alias non valide (3 caractères min et caractères spéciaux interdits)."
+    );
   }
 
-  if (!(Object.keys(RANKS).includes(hero_rank))) {
-    throw new BadRequestError("Rank non valide (S+, S, A, B, C)")
+  if (!Object.keys(RANKS).includes(hero_rank)) {
+    throw new BadRequestError("Rank non valide (S+, S, A, B, C)");
   }
   const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-  if (!dateRegex.test(hero_powerDate) || !(new Date(hero_powerDate).toISOString().slice(0, 10) === hero_powerDate)) {
-    console.log(hero_powerDate)
-    throw new BadRequestError("Date d'obtention du pouvoir non valide (format YYYY-MM-DD attendu)")
+  if (
+    !dateRegex.test(hero_powerDate) ||
+    !(new Date(hero_powerDate).toISOString().slice(0, 10) === hero_powerDate)
+  ) {
+    console.log(hero_powerDate);
+    throw new BadRequestError(
+      "Date d'obtention du pouvoir non valide (format YYYY-MM-DD attendu)"
+    );
   }
 
-  const rank_object = Object.entries(RANKS).find(([key]) => key === hero_rank)
-  let power = null
+  let power = null;
   if (power_label != "") {
     if (await PowerRepository.powerExists(power_label)) {
-      const existingPower = await PowerService.getPowerByLabel(power_label)
-      power = existingPower.power_id
+      const existingPower = await PowerService.getPowerByLabel(power_label);
+      power = existingPower.power_id;
     } else {
-      const newPower = await PowerService.createPower(power_label)
-      power = newPower.power_id
+      const newPower = await PowerService.createPower(power_label);
+      power = newPower.power_id;
     }
   }
 
+  const rank_object = Object.entries(RANKS).find(([key]) => key === hero_rank);
   const hero = await HeroRepository.updateHero(hero_id, {
     hero_alias,
     hero_identity,
     hero_powerDate,
     hero_rank: rank_object,
-    hero_power_id: power
+    hero_power_id: power,
   });
 
   return hero.dataValues;
@@ -174,12 +207,13 @@ export async function restoreHero(hero_id) {
   }
 
   if (await HeroRepository.heroExists(restoredHero.hero_alias)) {
-    throw new ConflictError("L'alias existe déjà. Le héros ne peut pas être restauré.")
+    throw new ConflictError(
+      "L'alias existe déjà. Le héros ne peut pas être restauré."
+    );
   }
 
   return HeroRepository.restoreHero(hero_id);
 }
-
 
 // DELETE
 

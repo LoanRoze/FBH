@@ -1,15 +1,27 @@
 import Hero from "../models/hero.model.js";
 
 // CREATE
-export async function createHero({ hero_alias, hero_identity, hero_powerDate, hero_rank, hero_power_id }) {
-  console.log(hero_rank)
-  const hero = await Hero.create({ hero_alias, hero_identity, hero_powerDate, hero_rank, hero_power_id });
+export async function createHero({
+  hero_alias,
+  hero_identity,
+  hero_powerDate,
+  hero_rank,
+  hero_power_id,
+}) {
+  const hero = await Hero.create({
+    hero_alias,
+    hero_identity,
+    hero_powerDate,
+    hero_rank,
+    hero_power_id,
+  });
   return hero;
 }
 
 // READ
 export async function getHeroById(hero_id) {
   const hero = await Hero.findByPk(hero_id);
+
   if (!hero) {
     return null;
   }
@@ -19,6 +31,7 @@ export async function getHeroById(hero_id) {
 
 export async function getDeletedHeroById(hero_id) {
   const hero = await Hero.scope("deleted").findByPk(hero_id);
+
   if (!hero) {
     return null;
   }
@@ -41,15 +54,14 @@ export async function heroDeletedExists(hero_alias) {
 }
 
 export async function getAllHeroesWithDeleted() {
-  await Hero.scope("withDeleted").findAll();
+  return await Hero.scope("withDeleted").findAll();
 }
 
 export async function getAllHeroesDeleted() {
-  await Hero.scope("deleted").findAll();
+  return await Hero.scope("deleted").findAll();
 }
 
-
-// UPDATE 
+// UPDATE
 export async function updateHero(hero_id, values) {
   const hero = await getHeroById(hero_id);
   if (!hero) {
@@ -76,7 +88,7 @@ export async function setHeroPower(hero_id, power_id) {
     return null;
   }
 
-  return hero.setDataValue('power_id', power_id)
+  return hero.setDataValue("power_id", power_id);
 }
 
 export async function removePowerFromHero(hero_id) {
@@ -86,20 +98,16 @@ export async function removePowerFromHero(hero_id) {
     return null;
   }
 
-  return hero.setDataValue('power_id', null)
+  return hero.setDataValue("power_id", null);
 }
-
 
 // DELETE
 export async function deleteHero(hero_id) {
   const hero = await getHeroById(hero_id);
+  
   if (!hero) {
     return null;
   }
 
   return await updateHero(hero.hero_id, { hero_isDeleted: true });
 }
-
-
-
-
